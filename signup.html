@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up – Financial Management</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="auth-page">
+
+    <!-- Left branding panel -->
+    <div class="brand-panel">
+      <div class="logo">💰</div>
+      <h1>FinanceManager</h1>
+      <p>Join thousands of users managing their money smarter.</p>
+      <ul class="features">
+        <li>Free to get started</li>
+        <li>Track income &amp; expenses</li>
+        <li>Set budgets &amp; savings goals</li>
+        <li>Real-time reports &amp; analytics</li>
+      </ul>
+    </div>
+
+    <!-- Right form panel -->
+    <div class="form-panel">
+      <div class="card">
+        <h2>Create account</h2>
+        <p class="subtitle">Start managing your finances today</p>
+
+        <!-- Alert messages -->
+        <div class="alert alert-error"   id="signupError"   role="alert"></div>
+        <div class="alert alert-success" id="signupSuccess" role="status"></div>
+
+        <form id="signupForm" novalidate>
+
+          <!-- Full name -->
+          <div class="form-group">
+            <label for="fullName">Full name</label>
+            <div class="input-wrapper">
+              <span class="icon">👤</span>
+              <input
+                type="text"
+                id="fullName"
+                name="fullName"
+                placeholder="John Doe"
+                autocomplete="name"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email">Email address</label>
+            <div class="input-wrapper">
+              <span class="icon">✉</span>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="you@example.com"
+                autocomplete="email"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-wrapper">
+              <span class="icon">🔒</span>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Create a strong password"
+                autocomplete="new-password"
+                required
+              />
+              <button
+                type="button"
+                class="toggle-pwd"
+                id="togglePwd"
+                aria-label="Toggle password visibility"
+              >👁</button>
+            </div>
+            <!-- Password strength -->
+            <div class="strength-bar-container">
+              <div class="strength-bar" id="strengthBar"></div>
+            </div>
+            <div class="strength-label" id="strengthLabel"></div>
+          </div>
+
+          <!-- Confirm password -->
+          <div class="form-group">
+            <label for="confirmPassword">Confirm password</label>
+            <div class="input-wrapper">
+              <span class="icon">🔒</span>
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                placeholder="Re-enter your password"
+                autocomplete="new-password"
+                required
+              />
+              <button
+                type="button"
+                class="toggle-pwd"
+                id="toggleConfirmPwd"
+                aria-label="Toggle confirm password visibility"
+              >👁</button>
+            </div>
+          </div>
+
+          <!-- Terms -->
+          <div class="form-group">
+            <label style="display:flex; align-items:flex-start; gap:0.5rem; cursor:pointer; font-weight:400; color:var(--text-muted); font-size:0.85rem;">
+              <input type="checkbox" id="terms" name="terms" style="margin-top:2px; flex-shrink:0;" required />
+              I agree to the <a href="#" class="form-link" style="margin:0 0.15rem;">Terms of Service</a> and <a href="#" class="form-link" style="margin:0 0.15rem;">Privacy Policy</a>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-primary">Create Account</button>
+        </form>
+
+        <div class="divider">or</div>
+
+        <div class="switch-link">
+          Already have an account?
+          <a href="login.html" class="form-link">Sign in</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ── Toggle password visibility (both fields) ──
+    function bindToggle(btnId, inputId) {
+      const btn   = document.getElementById(btnId);
+      const input = document.getElementById(inputId);
+      btn.addEventListener('click', () => {
+        const isText = input.type === 'text';
+        input.type   = isText ? 'password' : 'text';
+        btn.textContent = isText ? '👁' : '🙈';
+      });
+    }
+
+    bindToggle('togglePwd',        'password');
+    bindToggle('toggleConfirmPwd', 'confirmPassword');
+
+    // ── Password strength ──
+    const pwdInput     = document.getElementById('password');
+    const strengthBar  = document.getElementById('strengthBar');
+    const strengthLabel = document.getElementById('strengthLabel');
+
+    const LEVELS = [
+      { label: '',         color: '',          width: '0%'   },
+      { label: 'Weak',     color: '#ef4444',   width: '25%'  },
+      { label: 'Fair',     color: '#f97316',   width: '50%'  },
+      { label: 'Good',     color: '#eab308',   width: '75%'  },
+      { label: 'Strong',   color: '#22c55e',   width: '100%' },
+    ];
+
+    pwdInput.addEventListener('input', () => {
+      const v = pwdInput.value;
+      let score = 0;
+      if (v.length >= 8)               score++;
+      if (/[A-Z]/.test(v))             score++;
+      if (/[0-9]/.test(v))             score++;
+      if (/[^A-Za-z0-9]/.test(v))      score++;
+
+      const level = v.length === 0 ? 0 : Math.max(1, score);
+      strengthBar.style.width      = LEVELS[level].width;
+      strengthBar.style.background = LEVELS[level].color;
+      strengthLabel.textContent    = LEVELS[level].label;
+    });
+
+    // ── Form submission ──
+    const signupForm    = document.getElementById('signupForm');
+    const signupError   = document.getElementById('signupError');
+    const signupSuccess = document.getElementById('signupSuccess');
+
+    signupForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      signupError.style.display   = 'none';
+      signupSuccess.style.display = 'none';
+
+      const fullName        = document.getElementById('fullName').value.trim();
+      const email           = document.getElementById('email').value.trim();
+      const password        = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const terms           = document.getElementById('terms').checked;
+
+      if (!fullName || !email || !password || !confirmPassword) {
+        showError('Please fill in all fields.');
+        return;
+      }
+
+      if (fullName.length < 2) {
+        showError('Please enter your full name.');
+        return;
+      }
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showError('Please enter a valid email address.');
+        return;
+      }
+
+      if (password.length < 8) {
+        showError('Password must be at least 8 characters.');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showError('Passwords do not match.');
+        return;
+      }
+
+      if (!terms) {
+        showError('You must agree to the Terms of Service and Privacy Policy.');
+        return;
+      }
+
+      // TODO: Replace with real registration (e.g., API call)
+
+      signupSuccess.textContent    = 'Account created! Redirecting to login…';
+      signupSuccess.style.display  = 'block';
+      signupForm.reset();
+      strengthBar.style.width = '0%';
+      strengthLabel.textContent = '';
+
+      setTimeout(() => { window.location.href = 'login.html'; }, 2000);
+    });
+
+    function showError(msg) {
+      signupError.textContent    = msg;
+      signupError.style.display  = 'block';
+    }
+  </script>
+</body>
+</html>
